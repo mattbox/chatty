@@ -2,6 +2,7 @@ import java.util.regex.Matcher
 
 plugins {
     id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "edu.sc.seis.macAppBundle" version "2.1.6"
 }
 
 apply plugin: 'java'
@@ -188,3 +189,25 @@ task windowsZip(type: Zip, group: 'build') {
 task releaseWindows(group: 'build') {
     dependsOn release, windowsZip
 }
+
+//--------
+// OSX
+//--------
+// Running ./gradlew createAppZip builds a standalone macOS app with the JRE bundled. 
+// see https://github.com/crotwell/gradle-macappbundle for more information on how this plugin works
+macAppBundle {
+    appOutputDir = 'releases'
+    dmgOutputDir = 'releases'
+    bundleExecutable = 'Chatty'
+    bundleIdentifier = 'io.github.chatty'
+    mainClassName = 'chatty.Chatty'
+    icon = 'assets-bundle/chatty.icns'
+    appName = 'Chatty'
+    // Extra values to be added to the apps Info.plist    
+    bundleExtras.put('CFBundleDisplayName', 'Chatty')
+    bundleExtras.put('NSHumanReadableCopyright', 'Copyright (c) 2014 tduva')
+
+    // On mac it will pull the JRE from /usr/libexec/java_home. On other systems $JAVA_HOME needs to be set correctly, Otherwise the JRE location can be set manually using jreHome
+    bundleJRE = true
+}
+
